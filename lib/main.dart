@@ -1,15 +1,30 @@
-// Flutter run key commands.
-// r Hot reload.
-// R Hot restart.
-// h List all available interactive commands.
-// d Detach (terminate "flutter run" but leave application running).
-// c Clear the screen
-// q Quit (terminate the application on the device)z
+//
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'pages/todo_page.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+      options: FirebaseOptions(
+        apiKey: "AIzaSyCo9vZ9rtxgvR-mvGo4AppNCU7nlm-NyPw",
+        authDomain: "flutter-476e2.firebaseapp.com",
+        projectId: "flutter-476e2",
+        storageBucket: "flutter-476e2.appspot.com",
+        messagingSenderId: "1007713627843",
+        appId: "1:1007713627843:web:1d53201ad0b13b0eddfc76",
+        measurementId: "G-2W2CTVREE6",
+      ),
+    );
+  } else {
+    await Firebase.initializeApp();
+  }
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -18,52 +33,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'Todo Firebase',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const TodoPage(),
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        backgroundColor: const Color(0xFFF5F5F5),
-        appBar: AppBar(
-          title: const Text("ScreenTime Tracker"),
-          backgroundColor: const Color(0xFF4A47A3),
-          leading: const Icon(Icons.menu),
-          actions: [
-            IconButton(onPressed: () {}, icon: const Icon(Icons.refresh)),
-          ],
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: ListView(
-            children: [
-              buildCard("YouTube", "2h 15m", Icons.ondemand_video, Colors.red),
-              buildCard("Facebook", "1h 30m", Icons.facebook, Colors.blue),
-              buildCard("Instagram", "3h 05m", Icons.camera_alt, Colors.purple),
-              buildCard("LinkedIn", "45m", Icons.business, Colors.blueGrey),
-              buildCard(
-                "Twitter",
-                "1h 10m",
-                Icons.alternate_email,
-                Colors.lightBlue,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildCard(String app, String time, IconData icon, Color color) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: color,
-          child: Icon(icon, color: Colors.white),
-        ),
-        title: Text(app),
-        subtitle: Text("Screen Time: $time"),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-      ),
     );
   }
 }
