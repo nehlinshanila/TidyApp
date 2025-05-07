@@ -99,27 +99,29 @@ class TodoService {
           return const Center(child: Text("No tasks available"));
         }
 
-        // Group by content-based category
         final Map<String, List<DocumentSnapshot>> grouped = {};
         for (var doc in docs) {
-          final data = doc.data() as Map<String, dynamic>;
-          final category = data['category'] ?? 'Uncategorized';
+          final category =
+              (doc.data() as Map<String, dynamic>)['category'] ??
+              'Uncategorized';
           grouped.putIfAbsent(category, () => []).add(doc);
         }
 
         return ListView(
+          padding: const EdgeInsets.all(12),
           children:
               grouped.entries.map((entry) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Text(
                         entry.key,
                         style: const TextStyle(
-                          fontSize: 18,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
+                          color: Colors.deepPurple,
                         ),
                       ),
                     ),
@@ -129,49 +131,109 @@ class TodoService {
                       itemCount: entry.value.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 1,
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: 0.95,
                           ),
                       itemBuilder: (context, index) {
                         final todo = entry.value[index];
                         final data = todo.data() as Map<String, dynamic>;
-                        return Card(
-                          elevation: 3,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: Center(
-                                    child: Text(
-                                      data['task'] ?? '',
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(fontSize: 14),
+                        final task = data['task'] ?? '';
+                        final timeCategory = data['timeCategory'] ?? '';
+                        final timestamp =
+                            (data['timestamp'] as Timestamp?)?.toDate();
+
+                        final dateStr =
+                            timestamp != null
+                                ? "${timestamp.day}/${timestamp.month}/${timestamp.year}"
+                                : "No Date";
+                        final timeStr =
+                            timestamp != null
+                                ? "${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}"
+                                : "No Time";
+
+                        return GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder:
+                                  (context) => AlertDialog(
+                                    title: const Text("Task Detail"),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text("📝 Task: $task"),
+                                        const SizedBox(height: 6),
+                                        Text("🕒 Time: $timeStr"),
+                                        Text("📅 Date: $dateStr"),
+                                        Text("🏷️ When: $timeCategory"),
+                                      ],
                                     ),
+                                    actions: [
+                                      TextButton(
+                                        child: const Text("Close"),
+                                        onPressed:
+                                            () => Navigator.of(context).pop(),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: IconButton(
-                                    icon: const Icon(
-                                      Icons.delete,
-                                      color: Colors.red,
+                            );
+                          },
+                          child: Card(
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            color: Colors.white,
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "🕒 $timeStr",
+                                      style: const TextStyle(fontSize: 12),
                                     ),
-                                    onPressed: () async {
-                                      try {
-                                        await todo.reference.delete();
-                                      } catch (e) {
-                                        print("Error deleting: $e");
-                                      }
-                                    },
-                                  ),
+                                    Text(
+                                      "📅 $dateStr",
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                                    Text(
+                                      "📝 ${task.length > 30 ? task.substring(0, 30) + "..." : task}",
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    Text(
+                                      "🏷️ $timeCategory",
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                                    Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: IconButton(
+                                        icon: const Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                        ),
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(),
+                                        onPressed: () async {
+                                          try {
+                                            await todo.reference.delete();
+                                          } catch (e) {
+                                            print("Error deleting: $e");
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
                           ),
                         );
