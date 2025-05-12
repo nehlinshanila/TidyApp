@@ -121,7 +121,7 @@ class TodoService {
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
+                          color: Color.fromARGB(164, 64, 109, 255),
                         ),
                       ),
                     ),
@@ -218,7 +218,7 @@ class TodoService {
                                       child: IconButton(
                                         icon: const Icon(
                                           Icons.delete,
-                                          color: Colors.red,
+                                          color: Color.fromARGB(255, 244, 168, 54),
                                         ),
                                         padding: EdgeInsets.zero,
                                         constraints: const BoxConstraints(),

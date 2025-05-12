@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../services/todo_service.dart';
 import 'dart:async';
 
 class TodoPage extends StatefulWidget {
-  const TodoPage({Key? key}) : super(key: key);
+  const TodoPage({super.key});
 
   @override
   State<TodoPage> createState() => _TodoPageState();
@@ -25,10 +26,23 @@ class _TodoPageState extends State<TodoPage> {
     setState(() => _isLoading = false);
   }
 
+  Future<void> _handleLogout() async {
+    await FirebaseAuth.instance.signOut();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('My Todo List')),
+      appBar: AppBar(
+        title: const Text('My Todo List'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _handleLogout,
+            tooltip: 'Log Out',
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(
