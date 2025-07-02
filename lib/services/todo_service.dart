@@ -6,7 +6,8 @@ class TodoService {
   static final CollectionReference todos = FirebaseFirestore.instance
       .collection('todos');
 
-  static Future<void> addTodo(String text) async {
+  // Modified to accept title along with task text
+  static Future<void> addTodo(String title, String text) async {
     try {
       final parsedDate = Chrono.parseDate(text);
       final now = DateTime.now();
@@ -76,6 +77,7 @@ class TodoService {
       }
 
       await todos.add({
+        'title': title,
         'task': text,
         'timestamp': parsedDate ?? FieldValue.serverTimestamp(),
         'timeCategory': timeCategory,
@@ -121,7 +123,7 @@ class TodoService {
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(164, 64, 109, 255),
+                          color: Color.fromARGB(222, 100, 118, 180),
                         ),
                       ),
                     ),
@@ -139,6 +141,7 @@ class TodoService {
                       itemBuilder: (context, index) {
                         final todo = entry.value[index];
                         final data = todo.data() as Map<String, dynamic>;
+                        final title = data['title'] ?? '';
                         final task = data['task'] ?? '';
                         final timeCategory = data['timeCategory'] ?? '';
                         final timestamp =
@@ -159,7 +162,9 @@ class TodoService {
                               context: context,
                               builder:
                                   (context) => AlertDialog(
-                                    title: const Text("Task Detail"),
+                                    title: Text(
+                                      title.isEmpty ? "Task Detail" : title,
+                                    ),
                                     content: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       crossAxisAlignment:
@@ -195,6 +200,18 @@ class TodoService {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
+                                      title.isEmpty
+                                          ? "(No Title)"
+                                          : (title.length > 30
+                                              ? title.substring(0, 30) + "..."
+                                              : title),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
                                       "🕒 $timeStr",
                                       style: const TextStyle(fontSize: 12),
                                     ),
@@ -218,7 +235,12 @@ class TodoService {
                                       child: IconButton(
                                         icon: const Icon(
                                           Icons.delete,
-                                          color: Color.fromARGB(255, 244, 168, 54),
+                                          color: Color.fromARGB(
+                                            255,
+                                            244,
+                                            168,
+                                            54,
+                                          ),
                                         ),
                                         padding: EdgeInsets.zero,
                                         constraints: const BoxConstraints(),

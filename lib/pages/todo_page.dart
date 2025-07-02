@@ -11,17 +11,20 @@ class TodoPage extends StatefulWidget {
 }
 
 class _TodoPageState extends State<TodoPage> {
+  final TextEditingController _titleController = TextEditingController();
   final TextEditingController _controller = TextEditingController();
   bool _isLoading = false;
 
   Future<void> _handleAddTodo() async {
+    final title = _titleController.text.trim();
     final text = _controller.text.trim();
-    if (text.isEmpty) return;
+    if (title.isEmpty || text.isEmpty) return;
 
     setState(() => _isLoading = true);
 
-    await TodoService.addTodo(text);
+    await TodoService.addTodo(title, text);
 
+    _titleController.clear();
     _controller.clear();
     setState(() => _isLoading = false);
   }
@@ -47,24 +50,36 @@ class _TodoPageState extends State<TodoPage> {
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Row(
+            child: Column(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: const InputDecoration(
-                      hintText: 'Enter task...',
-                      border: OutlineInputBorder(),
-                    ),
+                TextField(
+                  controller: _titleController,
+                  decoration: const InputDecoration(
+                    hintText: 'Enter title...',
+                    border: OutlineInputBorder(),
                   ),
                 ),
-                const SizedBox(width: 10),
-                _isLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                      onPressed: _handleAddTodo,
-                      child: const Text('Add'),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        decoration: const InputDecoration(
+                          hintText: 'Enter task...',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
                     ),
+                    const SizedBox(width: 10),
+                    _isLoading
+                        ? const CircularProgressIndicator()
+                        : ElevatedButton(
+                          onPressed: _handleAddTodo,
+                          child: const Text('Add'),
+                        ),
+                  ],
+                ),
               ],
             ),
           ),

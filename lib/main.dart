@@ -31,7 +31,7 @@ void main() async {
   );
 
   ErrorWidget.builder = (FlutterErrorDetails details) {
-    return Container(); // Optionally replace with a custom error widget
+    return Container();
   };
 
   runApp(const MyApp());
@@ -44,7 +44,24 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Todo Firebase',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+        primaryColor: const Color(0xFF7886C7),
+        scaffoldBackgroundColor: const Color(0xFFFFF2F2),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF898AC4),
+          foregroundColor: Colors.white,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFA2AADB),
+            foregroundColor: Colors.white,
+          ),
+        ),
+        cardColor: const Color(0xFFA9B5DF),
+        textTheme: const TextTheme(
+          bodyMedium: TextStyle(color: Color(0xFF898AC4)),
+        ),
+      ),
       debugShowCheckedModeBanner: false,
       home: const AuthWrapper(),
     );
